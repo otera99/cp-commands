@@ -1,0 +1,153 @@
+#!/usr/bin/env python3
+
+# たぶん環境の指定(atcoder, codeforces, yukicoder)はいらなくて、現在のPATHからotera-cp-libraryを探すように実装すればいいと思う
+
+import re
+import sys
+import argparse
+from logging import Logger, basicConfig, getLogger
+from os import getenv, environ, pathsep, fspath
+from pathlib import Path, PurePath
+from typing import List, Set, Optional
+from subprocess import call, Popen, PIPE, run
+
+if __name__ == "__main__":
+    basicConfig(
+        format="%(asctime)s [%(levelname)s] %(message)s",
+        datefmt="%H:%M:%S",
+        level=getenv('LOG_LEVEL', 'INFO'),
+    )
+    parser = argparse.ArgumentParser(description='Run')
+    parser.add_argument('source', help='Source File')
+    parser.add_argument('-c', '--console',
+                        action='store_true', help='Print to Console')
+    parser.add_argument('-ac', '--atcoder', action='store_true', help='Compile at atcoder_acc')
+    parser.add_argument('-cf', '--codeforces', action='store_true', help='Compile at codeforces_new')
+    parser.add_argument('-yk', '--yukicoder', action='store_true', help='Compile at yukicoder_oj')
+    parser.add_argument('-oj', '--online_judge', action='store_true', help='command oj')
+    parser.add_argument('--d', help='a directory name for oj test cases')
+    parser.add_argument('-g++', '--compile', action='store_true', help='compile')
+    parser.add_argument('--o', help='g++ output execute file')
+    parser.add_argument('-exe', '--execute', action='store_true', help='execute')
+    parser.add_argument('-noi', '--noinput',action='store_true', help='nothing input')
+    parser.add_argument('--i', help='execute input file')
+    parser.add_argument('--output', help='execute output file')
+    parser.add_argument('-deb', '--debug', action='store_true', help='debug')
+    parser.add_argument('-sani', '--sanitaizer', action='store_true', help='sanitize')
+    parser.add_argument('-expand', '--expand', action='store_true', help='expand')
+    parser.add_argument('-cfa', '--codeforces_all', action='store_true', help='-cf -g++ -oj')
+    parser.add_argument('-aca', '--atcoder_all', action='store_true', help='-ac -g++ -oj --d ./tests/')
+    parser.add_argument('--cfdeb', help='-cf -g++ -deb -exe --i ./test/sample-num.in')
+    parser.add_argument('--acdeb', help='-ac -g++ -deb -exe --i ./tests/sample-num.in')
+    opts = parser.parse_args()
+
+    # 動くしこれでいいや
+    if opts.codeforces_all:
+        opts.codeforces = "codeforces"
+        opts.compile = "compile"
+        opts.online_judge = "oj"
+
+    if opts.atcoder_all:
+        opts.atcoder = "atcoder"
+        opts.compile = "compile"
+        opts.online_judge = "oj"
+        opts.d = "./tests/"
+
+    if opts.cfdeb:
+        opts.codeforces = "codeforces"
+        opts.compile = "compile"
+        opts.debug = "debug"
+        opts.execute = "execute"
+        opts.i = "./test/sample-" + opts.cfdeb + ".in"
+
+    if opts.acdeb:
+        opts.atcoder = "atcoder"
+        opts.compile = "compile"
+        opts.debug = "debug"
+        opts.execute = "execute"
+        opts.i = "./tests/sample-" + opts.cfdeb + ".in"
+
+    if opts.compile:
+        if opts.atcoder:
+            command = ["g++", opts.source, "-I", "../../../otera-cp-library", "-I", "../../../ac-library", "-std=gnu++17", "-O2"]
+            if opts.sanitaizer:
+                command.extend(["-Wall", "-Wextra", "-fsanitize=address", "-fsanitize=undefined"])
+            if opts.debug:
+                command.append("-DDEBUG")
+            if opts.o:
+                command.extend(["-o", opts.o])
+            call(command)
+        elif opts.codeforces:
+            command = ["g++", opts.source, "-I", "../../../otera-cp-library", "-I", "../../../ac-library", "-std=gnu++17", "-O2"]
+            if opts.sanitaizer:
+                command.extend(["-Wall", "-Wextra", "-fsanitize=address", "-fsanitize=undefined"])
+            if opts.debug:
+                command.append("-DDEBUG")
+            if opts.o:
+                command.extend(["-o", opts.o])
+            call(command)
+        elif opts.yukicoder:
+            command = ["g++", opts.source, "-I", "../../otera-cp-library", "-I", "../../ac-library", "-std=gnu++17", "-O2"]
+            if opts.sanitaizer:
+                command.extend(["-Wall", "-Wextra", "-fsanitize=address", "-fsanitize=undefined"])
+            if opts.debug:
+                command.append("-DDEBUG")
+            if opts.o:
+                command.extend(["-o", opts.o])
+            call(command)
+        else:
+            command = ["g++", opts.source, "-std=gnu++17", "-O2"]
+            if opts.sanitaizer:
+                command.extend(["-Wall", "-Wextra", "-fsanitize=address", "-fsanitize=undefined"])
+            if opts.debug:
+                command.append("-DDEBUG")
+            if opts.o:
+                command.extend(["-o", opts.o])
+            call(command)
+
+    if opts.online_judge:
+        if opts.d:
+            oj_command = ["oj", "t", "-d", opts.d]
+            call(oj_command)
+        else:
+            oj_command = ["oj", "t"]
+            call(oj_command)
+
+    if opts.execute:
+        command = []
+        if opts.o:
+            command.append("./" + opts.o)
+        else:
+            command.append("./a.out")
+        if opts.i:
+            # input = open(opts.input).read()
+            # print(input)
+            # proc = Popen(command, stdin=open(opts.input), stdout=PIPE)
+            if opts.output:
+                run(command, stdin=open(opts.i), stdout=open(opts.output, "w"), text=True)
+            else:
+                proc = run(command, stdin=open(opts.i), stdout=PIPE, text=True)
+                print(proc.stdout)
+        else:
+            if opts.output:
+                if opts.noinput:
+                    print("[WARNIG] : Check whether your code does not need input, carefully")
+                    run(command, input="", stdout=open(opts.output, "w"), text=True)
+                else:
+                    print("[WARNIG] : Write input by 1 line.\n")
+                    text = input()
+                    run(command, input=text, stdout=open(opts.output, "w"), text=True)
+            else:
+                call(command)
+
+    # 常に展開するようにした
+    # if opts.expand:
+    if opts.atcoder:
+        expand_ac_command = ["python3", "../../../expand.py", opts.source, "-ac"]
+        call(expand_ac_command)
+    if opts.codeforces:
+        expand_cf_command = ["python3", "../../../expand.py", opts.source, "-cf"]
+        call(expand_cf_command)
+    if opts.yukicoder:
+        expand_yk_command = ["python3", "../../expand.py", opts.source, "-yk"]
+        call(expand_yk_command)
