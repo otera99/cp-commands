@@ -143,11 +143,11 @@ if __name__ == "__main__":
     # 常に展開するようにした
     # if opts.expand:
     if opts.atcoder:
-        expand_ac_command = ["python3", "../../../expand.py", opts.source, "-ac"]
+        expand_ac_command = ["cp-expand", opts.source, "-ac"]
         call(expand_ac_command)
     if opts.codeforces:
-        expand_cf_command = ["python3", "../../../expand.py", opts.source, "-cf"]
+        expand_cf_command = ["cp-expand", opts.source, "-cf"]
         call(expand_cf_command)
     if opts.yukicoder:
-        expand_yk_command = ["python3", "../../expand.py", opts.source, "-yk"]
+        expand_yk_command = ["cp-expand", opts.source, "-yk"]
         call(expand_yk_command)
