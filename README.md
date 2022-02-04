@@ -9,6 +9,12 @@
 ([online-judge-tools](https://github.com/online-judge-tools/oj)と[atcoder-cli](https://github.com/Tatamo/atcoder-cli)という神ツールがあるので、そちらの使用を想定している.)
 
 ## スクリプトの動かし方
-https://qiita.com/i_shot1997/items/1699331e526cb90615df に書いてある.
 
-`cp-run`と`cp-expand`両方、上記の方法で入れる
+```
+chmod u+x {path to cp-commands}/cp-run
+chmod u+x {path to cp-commands}/cp-expand
+```
+
+として、`cp-commands`にPATHを通すと良い.
+
+なお、 https://qiita.com/i_shot1997/items/1699331e526cb90615df を参照すると良い.
