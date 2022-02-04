@@ -1,4 +1,4 @@
-# pycommands
+# cp-commands
 
 ## 使い方
 
