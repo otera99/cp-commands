@@ -65,7 +65,7 @@ if __name__ == "__main__":
         opts.compile = "compile"
         opts.debug = "debug"
         opts.execute = "execute"
-        opts.i = "./tests/sample-" + opts.cfdeb + ".in"
+        opts.i = "./tests/sample-" + opts.acdeb + ".in"
 
     if opts.compile:
         if opts.atcoder:
