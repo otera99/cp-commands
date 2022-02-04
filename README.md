@@ -10,3 +10,5 @@
 
 ## スクリプトの動かし方
 https://qiita.com/i_shot1997/items/1699331e526cb90615df に書いてある.
+
+`cp-run`と`cp-expand`両方、上記の方法で入れる
