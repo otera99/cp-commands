@@ -10,6 +10,7 @@ from os import getenv, environ, pathsep, fspath
 from pathlib import Path, PurePath
 from typing import List, Set, Optional
 from subprocess import call, Popen, PIPE, run
+import pyperclip
 
 if __name__ == "__main__":
     basicConfig(
@@ -151,3 +152,18 @@ if __name__ == "__main__":
     if opts.yukicoder:
         expand_yk_command = ["cp-expand", opts.source, "-yk"]
         call(expand_yk_command)
+
+    # ファイルのコピー機能を追加
+    target_file = opts.source
+    if opts.atcoder:
+        target_file = "combined_otera.cpp"
+    if opts.codeforces:
+        target_file = "combined.cpp"
+    if opts.yukicoder:
+        target_file = "combined.cpp"
+
+    target_str = open(target_file).read()
+    pyperclip.copy(target_str)
+    information_str = "(length:" + str(len(target_str)) + ")"
+    print("[INFO] copy", target_file, information_str)
+    
