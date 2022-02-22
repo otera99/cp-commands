@@ -160,7 +160,7 @@ if __name__ == "__main__":
     if opts.codeforces:
         target_file = "combined.cpp"
     if opts.yukicoder:
-        target_file = "combined.cpp"
+        target_file = "combined_otera.cpp"
 
     target_str = open(target_file).read()
     pyperclip.copy(target_str)
