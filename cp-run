@@ -108,10 +108,10 @@ if __name__ == "__main__":
 
     if opts.online_judge:
         if opts.d:
-            oj_command = ["oj", "t", "-d", opts.d]
+            oj_command = ["oj", "t", "-d", opts.d, "-D"]
             call(oj_command)
         else:
-            oj_command = ["oj", "t"]
+            oj_command = ["oj", "t", "-D"]
             call(oj_command)
 
     if opts.execute:
