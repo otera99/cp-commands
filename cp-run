@@ -189,12 +189,27 @@ if __name__ == "__main__":
 
     # ファイルのコピー機能を追加
     target_file = opts.source
-    if opts.atcoder:
+    if opts.atcoder and otera_lib_path != "can_not_find":
         target_file = "combined_otera.cpp"
-    if opts.codeforces:
+    if opts.codeforces and otera_lib_path != "can_not_find":
         target_file = "combined.cpp"
-    if opts.yukicoder:
+    if opts.yukicoder and otera_lib_path != "can_not_find":
         target_file = "combined_otera.cpp"
+
+    if opts.atcoder:
+        submit_file = "atcoder_submit.cpp"
+        submit_writer = open(submit_file, "w")
+        target_reader = open(target_file).read()
+        for line in target_reader.splitlines():
+            count_apost = line.count('\'')
+            submit_writer.write(line)
+            submit_writer.write("\n")
+            if count_apost % 2 == 1:
+                new_line = "//\'\n"
+                submit_writer.write(new_line)
+        submit_writer.close()
+        print("[INFO] generate atcoder_submit.cpp")
+        target_file = submit_file
 
     target_str = open(target_file).read()
     pyperclip.copy(target_str)
