@@ -95,42 +95,53 @@ if __name__ == "__main__":
         opts.i = "./tests/sample-" + opts.acdeb + ".in"
 
     if opts.compile:
-        if opts.atcoder:
-            command = ["g++", opts.source, "-I", "../../../otera-cp-library", "-I", "../../../ac-library", "-std=gnu++17", "-O2"]
-            if opts.sanitaizer:
-                command.extend(["-Wall", "-Wextra", "-fsanitize=address", "-fsanitize=undefined"])
-            if opts.debug:
-                command.append("-DDEBUG")
-            if opts.o:
-                command.extend(["-o", opts.o])
-            call(command)
-        elif opts.codeforces:
-            command = ["g++", opts.source, "-I", "../../../otera-cp-library", "-I", "../../../ac-library", "-std=gnu++17", "-O2"]
-            if opts.sanitaizer:
-                command.extend(["-Wall", "-Wextra", "-fsanitize=address", "-fsanitize=undefined"])
-            if opts.debug:
-                command.append("-DDEBUG")
-            if opts.o:
-                command.extend(["-o", opts.o])
-            call(command)
-        elif opts.yukicoder:
-            command = ["g++", opts.source, "-I", "../../otera-cp-library", "-I", "../../ac-library", "-std=gnu++17", "-O2"]
-            if opts.sanitaizer:
-                command.extend(["-Wall", "-Wextra", "-fsanitize=address", "-fsanitize=undefined"])
-            if opts.debug:
-                command.append("-DDEBUG")
-            if opts.o:
-                command.extend(["-o", opts.o])
-            call(command)
-        else:
-            command = ["g++", opts.source, "-std=gnu++17", "-O2"]
-            if opts.sanitaizer:
-                command.extend(["-Wall", "-Wextra", "-fsanitize=address", "-fsanitize=undefined"])
-            if opts.debug:
-                command.append("-DDEBUG")
-            if opts.o:
-                command.extend(["-o", opts.o])
-            call(command)
+        compile_command = ["g++", opts.source, "-std=gnu++17", "-O2"]
+        if otera_lib_path != "can_not_find":
+            compile_command.extend(["-I", otera_lib_path, "-I", atcoder_lib_path])
+        
+        if opts.sanitaizer:
+            compile_command.extend(["-Wall", "-Wextra", "-fsanitize=address", "-fsanitize=undefined"])
+        if opts.debug:
+            compile_command.append("-DDEBUG")
+        if opts.o:
+            compile_command.extend(["-o", opts.o])
+        call(compile_command)
+        # if opts.atcoder:
+        #     command = ["g++", opts.source, "-I", "../../../otera-cp-library", "-I", "../../../ac-library", "-std=gnu++17", "-O2"]
+        #     if opts.sanitaizer:
+        #         command.extend(["-Wall", "-Wextra", "-fsanitize=address", "-fsanitize=undefined"])
+        #     if opts.debug:
+        #         command.append("-DDEBUG")
+        #     if opts.o:
+        #         command.extend(["-o", opts.o])
+        #     call(command)
+        # elif opts.codeforces:
+        #     command = ["g++", opts.source, "-I", "../../../otera-cp-library", "-I", "../../../ac-library", "-std=gnu++17", "-O2"]
+        #     if opts.sanitaizer:
+        #         command.extend(["-Wall", "-Wextra", "-fsanitize=address", "-fsanitize=undefined"])
+        #     if opts.debug:
+        #         command.append("-DDEBUG")
+        #     if opts.o:
+        #         command.extend(["-o", opts.o])
+        #     call(command)
+        # elif opts.yukicoder:
+        #     command = ["g++", opts.source, "-I", "../../otera-cp-library", "-I", "../../ac-library", "-std=gnu++17", "-O2"]
+        #     if opts.sanitaizer:
+        #         command.extend(["-Wall", "-Wextra", "-fsanitize=address", "-fsanitize=undefined"])
+        #     if opts.debug:
+        #         command.append("-DDEBUG")
+        #     if opts.o:
+        #         command.extend(["-o", opts.o])
+        #     call(command)
+        # else:
+        #     command = ["g++", opts.source, "-std=gnu++17", "-O2"]
+        #     if opts.sanitaizer:
+        #         command.extend(["-Wall", "-Wextra", "-fsanitize=address", "-fsanitize=undefined"])
+        #     if opts.debug:
+        #         command.append("-DDEBUG")
+        #     if opts.o:
+        #         command.extend(["-o", opts.o])
+        #     call(command)
 
     if opts.online_judge:
         if opts.d:

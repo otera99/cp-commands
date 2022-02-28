@@ -30,9 +30,7 @@ chmod u+x {path to cp-commands}/cp-run
 2022.03.01: ディレクトリの構成に依存せずに展開できるような実装に書き換えた.
 
 ## TODO
-コンパイル時に参照するライブラリのpathを`lib_serach.find_otera()`で見つけたものにするように書きかえる.
-
-`cp-expand`の削除
+コンパイル時に参照するライブラリのpathを`lib_serach.find_otera()`で見つけたものにするように書きかえる.(2022.03.01に追加済み)
 
 `lib_serach.find_otera()`の修正
 
