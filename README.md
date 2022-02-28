@@ -1,5 +1,11 @@
 # cp-commands
 
+## なにができるのか
+
+AtCoderの場合、[atcoder-cli](https://github.com/Tatamo/atcoder-cli)で生成したファイル下にコードで書き、`cp-run source -aca`とすることで、コンパイル、[online-judge-tools](https://github.com/online-judge-tools/oj)によるテスト、[otera-cp-library](https://github.com/otera99/otera-cp-library)の展開、提出用コードのクリップボードへのコピーを一度に行える.
+
+Codeforcesの場合もAtCoderと同様に問題ごとのファイルを作り、[online-judge-tools](https://github.com/online-judge-tools/oj)でテストケースをダウンロードしておけば、あとはコードを書いた後、`cp-run source -cfa`とすることで、コンパイル、[online-judge-tools](https://github.com/online-judge-tools/oj)によるテスト、[AtCoder Library (ACL)](https://github.com/atcoder/ac-library)と[otera-cp-library](https://github.com/otera99/otera-cp-library)の展開、提出用コードのクリップボードへのコピーを一度に行える.
+
 ## 使い方
 
 競技プログラミング用のrepositoryを作って、そこの下に[otera-cp-library](https://github.com/otera99/otera-cp-library)をダウンロードして入れる.
@@ -12,9 +18,22 @@
 
 ```
 chmod u+x {path to cp-commands}/cp-run
-chmod u+x {path to cp-commands}/cp-expand
 ```
 
 として、`cp-commands`にPATHを通すと良い.
 
 なお、 https://qiita.com/i_shot1997/items/1699331e526cb90615df を参照すると良い.
+
+## 更新履歴
+2022.03.01: ディレクトリの構成に依存せずに展開できるような実装に書き換えた.
+
+## TODO
+コンパイル時に参照するライブラリのpathを`lib_serach.find_otera()`で見つけたものにするように書きかえる.
+
+`cp-expand`の削除
+
+`lib_serach.find_otera()`の修正
+
+ojコマンドのoptionを使えるようにする
+
+AtCoderにコードを提出する時、`const int inf = 1'000'000'007;`などとすると、コメントと判定されてコードが読みにくくなるので、後ろに`//'`などとつけて展開してくれる機能があると嬉しい

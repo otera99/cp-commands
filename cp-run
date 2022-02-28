@@ -12,6 +12,28 @@ from typing import List, Set, Optional
 from subprocess import call, Popen, PIPE, run
 import pyperclip
 
+OTERA_LIBRARY = 'otera-cp-library'
+ATCODER_LIBRARY = 'ac-library'
+
+# 現在のPATHからotera-cp-libraryを探すような実装
+class Lib_Serach:
+    def __init__(self):
+        pass
+
+    def find_otera(self):
+        self.cur_path = Path.cwd()
+        self.count = 0
+        while self.count < 20:
+            otera_library_path = self.cur_path / OTERA_LIBRARY
+            if otera_library_path.exists():
+                print("[INFO] find path of otera-cp-library as ", str(otera_library_path))
+                return str(otera_library_path)
+            self.count += 1
+            self.cur_path = self.cur_path.parent
+
+        print("[INFO] can not find otera-cp-library")
+        return "can_not_find"
+
 if __name__ == "__main__":
     basicConfig(
         format="%(asctime)s [%(levelname)s] %(message)s",
@@ -41,6 +63,10 @@ if __name__ == "__main__":
     parser.add_argument('--cfdeb', help='-cf -g++ -deb -exe --i ./test/sample-num.in')
     parser.add_argument('--acdeb', help='-ac -g++ -deb -exe --i ./tests/sample-num.in')
     opts = parser.parse_args()
+
+    lib_serach = Lib_Serach()
+    otera_lib_path = lib_serach.find_otera()
+    atcoder_lib_path = otera_lib_path + '/' + ATCODER_LIBRARY
 
     # 動くしこれでいいや
     if opts.codeforces_all:
@@ -108,10 +134,10 @@ if __name__ == "__main__":
 
     if opts.online_judge:
         if opts.d:
-            oj_command = ["oj", "t", "-d", opts.d, "-D"]
+            oj_command = ["oj", "t", "-d", opts.d]
             call(oj_command)
         else:
-            oj_command = ["oj", "t", "-D"]
+            oj_command = ["oj", "t"]
             call(oj_command)
 
     if opts.execute:
@@ -142,16 +168,24 @@ if __name__ == "__main__":
                 call(command)
 
     # 常に展開するようにした
+    if otera_lib_path != "can_not_find":
+        expand_command = ["python3", otera_lib_path + "/expander.py", "--lib", otera_lib_path, opts.source]
+        if not(opts.atcoder or opts.yukicoder):
+            expand_command.append("-ac")
+        call(expand_command)
     # if opts.expand:
-    if opts.atcoder:
-        expand_ac_command = ["cp-expand", opts.source, "-ac"]
-        call(expand_ac_command)
-    if opts.codeforces:
-        expand_cf_command = ["cp-expand", opts.source, "-cf"]
-        call(expand_cf_command)
-    if opts.yukicoder:
-        expand_yk_command = ["cp-expand", opts.source, "-yk"]
-        call(expand_yk_command)
+    # if opts.atcoder:
+    #     expand_ac_command = ["cp-expand", opts.source, "-ac"]
+    #     call(expand_ac_command)
+    # elif opts.codeforces:
+    #     expand_cf_command = ["cp-expand", opts.source, "-cf"]
+    #     call(expand_cf_command)
+    # elif opts.yukicoder:
+    #     expand_yk_command = ["cp-expand", opts.source, "-yk"]
+    #     call(expand_yk_command)
+    # elif otera_lib_path != "can_not_find":
+    #     expand_command = ["python3", otera_lib_path + "/expander.py", "-lib", otera_lib_path, opts.source]
+
 
     # ファイルのコピー機能を追加
     target_file = opts.source
