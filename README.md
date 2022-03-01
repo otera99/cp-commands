@@ -6,6 +6,8 @@ AtCoderの場合、[atcoder-cli](https://github.com/Tatamo/atcoder-cli)で生成
 
 Codeforcesの場合もAtCoderと同様に問題ごとのファイルを作り、[online-judge-tools](https://github.com/online-judge-tools/oj)でテストケースをダウンロードしておけば、あとはコードを書いた後、`cp-run source -cfa`とすることで、コンパイル、[online-judge-tools](https://github.com/online-judge-tools/oj)によるテスト、[AtCoder Library (ACL)](https://github.com/atcoder/ac-library)と[otera-cp-library](https://github.com/otera99/otera-cp-library)の展開、提出用コードのクリップボードへのコピーを一度に行える.
 
+なお、現時点では、C++以外の言語には対応していない.
+
 ## 使い方
 
 競技プログラミング用のrepositoryを作って、そこの下に[otera-cp-library](https://github.com/otera99/otera-cp-library)をダウンロードして入れる.
@@ -37,3 +39,8 @@ chmod u+x {path to cp-commands}/cp-run
 ojコマンドのoptionを使えるようにする
 
 AtCoderにコードを提出する時、`const int inf = 1'000'000'007;`などとすると、コメントと判定されてコードが読みにくくなるので、後ろに`//'`などとつけて展開してくれる機能があると嬉しい(2022.03.01に追加済み)
+
+コンパイルに失敗したら、ojコマンドなどは実行しないで欲しい.
+
+## 注意
+コードのクリップボードへのコピーまでには数秒ほどかかるので(ojでテストにかかる時間などで)、実行が終わった(コピーが終わったと出る)までは、コードを提出しないように気をつける.
