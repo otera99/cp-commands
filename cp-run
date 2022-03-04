@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-# たぶん環境の指定(atcoder, codeforces, yukicoder)はいらなくて、現在のPATHからotera-cp-libraryを探すように実装すればいいと思う
-
 import re
 import sys
 import argparse
@@ -44,9 +42,9 @@ if __name__ == "__main__":
     parser.add_argument('source', help='Source File')
     parser.add_argument('-c', '--console',
                         action='store_true', help='Print to Console')
-    parser.add_argument('-ac', '--atcoder', action='store_true', help='Compile at atcoder_acc')
-    parser.add_argument('-cf', '--codeforces', action='store_true', help='Compile at codeforces_new')
-    parser.add_argument('-yk', '--yukicoder', action='store_true', help='Compile at yukicoder_oj')
+    parser.add_argument('-ac', '--atcoder', action='store_true', help='At atcoder')
+    parser.add_argument('-cf', '--codeforces', action='store_true', help='At codeforces')
+    parser.add_argument('-yk', '--yukicoder', action='store_true', help='At yukicoder')
     parser.add_argument('-oj', '--online_judge', action='store_true', help='command oj')
     parser.add_argument('--d', help='a directory name for oj test cases')
     parser.add_argument('-g++', '--compile', action='store_true', help='compile')
@@ -95,6 +93,7 @@ if __name__ == "__main__":
         opts.i = "./tests/sample-" + opts.acdeb + ".in"
 
     if opts.compile:
+        print("[INFO] start: compile")
         compile_command = ["g++", opts.source, "-std=gnu++17", "-O2"]
         if otera_lib_path != "can_not_find":
             compile_command.extend(["-I", otera_lib_path, "-I", atcoder_lib_path])
@@ -107,42 +106,6 @@ if __name__ == "__main__":
             compile_command.extend(["-o", opts.o])
         call(compile_command)
         print("[INFO] done: compile")
-        # if opts.atcoder:
-        #     command = ["g++", opts.source, "-I", "../../../otera-cp-library", "-I", "../../../ac-library", "-std=gnu++17", "-O2"]
-        #     if opts.sanitaizer:
-        #         command.extend(["-Wall", "-Wextra", "-fsanitize=address", "-fsanitize=undefined"])
-        #     if opts.debug:
-        #         command.append("-DDEBUG")
-        #     if opts.o:
-        #         command.extend(["-o", opts.o])
-        #     call(command)
-        # elif opts.codeforces:
-        #     command = ["g++", opts.source, "-I", "../../../otera-cp-library", "-I", "../../../ac-library", "-std=gnu++17", "-O2"]
-        #     if opts.sanitaizer:
-        #         command.extend(["-Wall", "-Wextra", "-fsanitize=address", "-fsanitize=undefined"])
-        #     if opts.debug:
-        #         command.append("-DDEBUG")
-        #     if opts.o:
-        #         command.extend(["-o", opts.o])
-        #     call(command)
-        # elif opts.yukicoder:
-        #     command = ["g++", opts.source, "-I", "../../otera-cp-library", "-I", "../../ac-library", "-std=gnu++17", "-O2"]
-        #     if opts.sanitaizer:
-        #         command.extend(["-Wall", "-Wextra", "-fsanitize=address", "-fsanitize=undefined"])
-        #     if opts.debug:
-        #         command.append("-DDEBUG")
-        #     if opts.o:
-        #         command.extend(["-o", opts.o])
-        #     call(command)
-        # else:
-        #     command = ["g++", opts.source, "-std=gnu++17", "-O2"]
-        #     if opts.sanitaizer:
-        #         command.extend(["-Wall", "-Wextra", "-fsanitize=address", "-fsanitize=undefined"])
-        #     if opts.debug:
-        #         command.append("-DDEBUG")
-        #     if opts.o:
-        #         command.extend(["-o", opts.o])
-        #     call(command)
 
     if opts.online_judge:
         if opts.d:
@@ -185,19 +148,6 @@ if __name__ == "__main__":
         if not(opts.atcoder or opts.yukicoder):
             expand_command.append("-ac")
         call(expand_command)
-    # if opts.expand:
-    # if opts.atcoder:
-    #     expand_ac_command = ["cp-expand", opts.source, "-ac"]
-    #     call(expand_ac_command)
-    # elif opts.codeforces:
-    #     expand_cf_command = ["cp-expand", opts.source, "-cf"]
-    #     call(expand_cf_command)
-    # elif opts.yukicoder:
-    #     expand_yk_command = ["cp-expand", opts.source, "-yk"]
-    #     call(expand_yk_command)
-    # elif otera_lib_path != "can_not_find":
-    #     expand_command = ["python3", otera_lib_path + "/expander.py", "-lib", otera_lib_path, opts.source]
-
 
     # ファイルのコピー機能を追加
     target_file = opts.source
