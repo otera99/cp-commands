@@ -60,13 +60,18 @@ if __name__ == "__main__":
     parser.add_argument('-aca', '--atcoder_all', action='store_true', help='-ac -g++ -oj --d ./tests/')
     parser.add_argument('--cfdeb', help='-cf -g++ -deb -exe --i ./test/sample-num.in')
     parser.add_argument('--acdeb', help='-ac -g++ -deb -exe --i ./tests/sample-num.in')
+    parser.add_argument('--lib', help='otera-cp-library path')
     opts = parser.parse_args()
+    
+    otera_lib_path = "can_not_find"
+    
+    if opts.lib:
+        otera_lib_path = opts.lib
+    else:
+        lib_serach = Lib_Serach()
+        otera_lib_path = lib_serach.find_otera()
+        atcoder_lib_path = otera_lib_path + '/' + ATCODER_LIBRARY
 
-    lib_serach = Lib_Serach()
-    otera_lib_path = lib_serach.find_otera()
-    atcoder_lib_path = otera_lib_path + '/' + ATCODER_LIBRARY
-
-    # 動くしこれでいいや
     if opts.codeforces_all:
         opts.codeforces = "codeforces"
         opts.compile = "compile"
