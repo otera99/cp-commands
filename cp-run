@@ -13,6 +13,11 @@ import pyperclip
 OTERA_LIBRARY = 'otera-cp-library'
 ATCODER_LIBRARY = 'ac-library'
 
+RED = '\033[91m'
+BLUE = '\033[94m'
+GREEN = '\033[92m'
+END = '\033[0m'
+
 # 現在のPATHからotera-cp-libraryを探すような実装
 class Lib_Serach:
     def __init__(self):
@@ -29,7 +34,7 @@ class Lib_Serach:
             self.count += 1
             self.cur_path = self.cur_path.parent
 
-        print("[INFO] can not find otera-cp-library")
+        print(RED + "[INFO] can not find otera-cp-library" + END)
         return "can_not_find"
 
 if __name__ == "__main__":
@@ -134,7 +139,7 @@ if __name__ == "__main__":
         res_str = proc.stderr
         idx = res_str.find("error")
         if idx != -1:
-            print("[ERROR] compile error")
+            print(RED + "[ERROR] compile error" + END)
             if opts.message:
                 print(res_str)
             if (not opts.force):
@@ -211,16 +216,18 @@ if __name__ == "__main__":
                 new_line = "//\'\n"
                 submit_writer.write(new_line)
         submit_writer.close()
-        print("[INFO] generate atcoder_submit.cpp")
+        print(GREEN + "[INFO] generate atcoder_submit.cpp" + END)
         target_file = submit_file
 
     if opts.copy:
         target_str = open(target_file).read()
         pyperclip.copy(target_str)
         information_str = "(length:" + str(len(target_str)) + ")"
-        print("[INFO] copy", target_file, information_str)
+        print(GREEN + "[INFO] copy", target_file, information_str + END)
         
     if opts.modify and (not opts.sanitaizer):
         modify_command = ["python3", otera_lib_path + "/modify.py", "--lib", otera_lib_path, target_file]
         call(modify_command)
-    
+        
+    if opts.modify or opts.sanitaizer:
+        print(RED + "[WARN]: DO NOT EDIT modiy.cpp" + END)
