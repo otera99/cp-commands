@@ -7,7 +7,7 @@ from logging import Logger, basicConfig, getLogger
 from os import getenv, environ, pathsep, fspath
 from pathlib import Path, PurePath
 from typing import List, Set, Optional
-from subprocess import call, Popen, PIPE, run
+from subprocess import call, Popen, PIPE, run, STDOUT
 import pyperclip
 
 OTERA_LIBRARY = 'otera-cp-library'
@@ -40,8 +40,8 @@ if __name__ == "__main__":
     )
     parser = argparse.ArgumentParser(description='Run')
     parser.add_argument('source', help='Source File')
-    parser.add_argument('-c', '--console',
-                        action='store_true', help='Print to Console')
+    # parser.add_argument('-c', '--console',
+    #                     action='store_true', help='Print to Console')
     parser.add_argument('-ac', '--atcoder', action='store_true', help='At atcoder')
     parser.add_argument('-cf', '--codeforces', action='store_true', help='At codeforces')
     parser.add_argument('-yk', '--yukicoder', action='store_true', help='At yukicoder')
@@ -55,13 +55,17 @@ if __name__ == "__main__":
     parser.add_argument('--output', help='execute output file')
     parser.add_argument('-deb', '--debug', action='store_true', help='debug')
     parser.add_argument('-sani', '--sanitaizer', action='store_true', help='sanitize')
-    parser.add_argument('-expand', '--expand', action='store_true', help='expand')
+    parser.add_argument('-e', '--expand', action='store_true', help='expand')
     parser.add_argument('-cfa', '--codeforces_all', action='store_true', help='-cf -g++ -oj')
     parser.add_argument('-aca', '--atcoder_all', action='store_true', help='-ac -g++ -oj --d ./tests/')
     parser.add_argument('--cfdeb', help='-cf -g++ -deb -exe --i ./test/sample-num.in')
     parser.add_argument('--acdeb', help='-ac -g++ -deb -exe --i ./tests/sample-num.in')
     parser.add_argument('--lib', help='otera-cp-library path')
     parser.add_argument('-nocopy', '--no_copy', action='store_true', help='no copy code')
+    parser.add_argument('-f', '--force', action='store_true', help='Force')
+    parser.add_argument('-m', '--message', action='store_true', help='display message')
+    parser.add_argument('-c', '--copy', action='store_true', help='copy source')
+    parser.add_argument('-modify', '--modify', action='store_true', help='modify source')
     
     parser.add_argument('-get', '--get_lib_path', action='store_true', help='Get Library Path')
     opts = parser.parse_args()
@@ -83,12 +87,16 @@ if __name__ == "__main__":
         opts.codeforces = "codeforces"
         opts.compile = "compile"
         opts.online_judge = "oj"
+        opts.expand = "expand"
+        opts.copy = "copy"
 
     if opts.atcoder_all:
         opts.atcoder = "atcoder"
         opts.compile = "compile"
         opts.online_judge = "oj"
         opts.d = "./tests/"
+        opts.expand = "expand"
+        opts.copy = "copy"
 
     if opts.cfdeb:
         opts.codeforces = "codeforces"
@@ -96,6 +104,7 @@ if __name__ == "__main__":
         opts.debug = "debug"
         opts.execute = "execute"
         opts.i = "./test/sample-" + opts.cfdeb + ".in"
+        # opts.expand = "expand"
 
     if opts.acdeb:
         opts.atcoder = "atcoder"
@@ -103,6 +112,7 @@ if __name__ == "__main__":
         opts.debug = "debug"
         opts.execute = "execute"
         opts.i = "./tests/sample-" + opts.acdeb + ".in"
+        # opts.expand = "expand"
 
     if opts.compile:
         print("[INFO] start: compile")
@@ -110,14 +120,27 @@ if __name__ == "__main__":
         if otera_lib_path != "can_not_find":
             compile_command.extend(["-I", otera_lib_path, "-I", atcoder_lib_path])
         
-        if opts.sanitaizer:
-            compile_command.extend(["-Wall", "-Wextra", "-fsanitize=address", "-fsanitize=undefined"])
         if opts.debug:
             compile_command.append("-DDEBUG")
         if opts.o:
             compile_command.extend(["-o", opts.o])
-        call(compile_command)
-        print("[INFO] done: compile")
+        # call(compile_command)
+        if opts.sanitaizer:
+            modify_command = ["python3", otera_lib_path + "/modify.py", "--lib", otera_lib_path, opts.source]
+            call(modify_command)
+            compile_command = ["/usr/bin/g++", "modify.cpp", "-std=c++17", "-g", "-Wall", "-Wextra", "-fsanitize=address", "-fsanitize=undefined", "-O2"]
+        
+        proc = run(compile_command, stderr=PIPE, text=True)
+        res_str = proc.stderr
+        idx = res_str.find("error")
+        if idx != -1:
+            print("[ERROR] compile error")
+            if opts.message:
+                print(res_str)
+            if (not opts.force):
+                exit(0)
+        else:
+            print("[INFO] done: compile")
 
     if opts.online_judge:
         if opts.d:
@@ -140,7 +163,7 @@ if __name__ == "__main__":
             if opts.output:
                 run(command, stdin=open(opts.i), stdout=open(opts.output, "w"), text=True)
             else:
-                proc = run(command, stdin=open(opts.i), stdout=PIPE, text=True)
+                proc = run(command, stdin=open(opts.i), stdout=PIPE, stderr=STDOUT, text=True)
                 print(proc.stdout)
         else:
             if opts.output:
@@ -154,12 +177,12 @@ if __name__ == "__main__":
             else:
                 call(command)
 
-    # 常に展開するようにした
-    if otera_lib_path != "can_not_find":
-        expand_command = ["python3", otera_lib_path + "/expander.py", "--lib", otera_lib_path, opts.source]
-        if not(opts.atcoder or opts.yukicoder):
-            expand_command.append("-ac")
-        call(expand_command)
+    if opts.expand:
+        if otera_lib_path != "can_not_find":
+            expand_command = ["python3", otera_lib_path + "/expander.py", "--lib", otera_lib_path, opts.source]
+            if not(opts.atcoder or opts.yukicoder):
+                expand_command.append("-ac")
+            call(expand_command)
 
     # ファイルのコピー機能を追加
     target_file = opts.source
@@ -191,9 +214,13 @@ if __name__ == "__main__":
         print("[INFO] generate atcoder_submit.cpp")
         target_file = submit_file
 
-    if not opts.no_copy:
+    if opts.copy:
         target_str = open(target_file).read()
         pyperclip.copy(target_str)
         information_str = "(length:" + str(len(target_str)) + ")"
         print("[INFO] copy", target_file, information_str)
+        
+    if opts.modify and (not opts.sanitaizer):
+        modify_command = ["python3", otera_lib_path + "/modify.py", "--lib", otera_lib_path, target_file]
+        call(modify_command)
     
