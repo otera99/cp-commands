@@ -61,6 +61,9 @@ if __name__ == "__main__":
     parser.add_argument('--cfdeb', help='-cf -g++ -deb -exe --i ./test/sample-num.in')
     parser.add_argument('--acdeb', help='-ac -g++ -deb -exe --i ./tests/sample-num.in')
     parser.add_argument('--lib', help='otera-cp-library path')
+    parser.add_argument('-nocopy', '--no_copy', action='store_true', help='no copy code')
+    
+    parser.add_argument('-get', '--get_lib_path', action='store_true', help='Get Library Path')
     opts = parser.parse_args()
     
     otera_lib_path = "can_not_find"
@@ -71,6 +74,10 @@ if __name__ == "__main__":
         lib_serach = Lib_Serach()
         otera_lib_path = lib_serach.find_otera()
         atcoder_lib_path = otera_lib_path + '/' + ATCODER_LIBRARY
+        
+    if opts.get_lib_path:
+        print("-I", otera_lib_path, "-I", atcoder_lib_path)
+        exit(0)
 
     if opts.codeforces_all:
         opts.codeforces = "codeforces"
@@ -156,11 +163,17 @@ if __name__ == "__main__":
 
     # ファイルのコピー機能を追加
     target_file = opts.source
+    
+    if otera_lib_path != "can_not_find":
+        target_file = "combined.cpp"
+    
     if opts.atcoder and otera_lib_path != "can_not_find":
         target_file = "combined_otera.cpp"
-    if opts.codeforces and otera_lib_path != "can_not_find":
+    elif opts.codeforces and otera_lib_path != "can_not_find":
         target_file = "combined.cpp"
-    if opts.yukicoder and otera_lib_path != "can_not_find":
+    elif opts.yukicoder and otera_lib_path != "can_not_find":
+        target_file = "combined_otera.cpp"
+    elif otera_lib_path != "can_not_find":
         target_file = "combined_otera.cpp"
 
     if opts.atcoder:
@@ -178,8 +191,9 @@ if __name__ == "__main__":
         print("[INFO] generate atcoder_submit.cpp")
         target_file = submit_file
 
-    target_str = open(target_file).read()
-    pyperclip.copy(target_str)
-    information_str = "(length:" + str(len(target_str)) + ")"
-    print("[INFO] copy", target_file, information_str)
+    if not opts.no_copy:
+        target_str = open(target_file).read()
+        pyperclip.copy(target_str)
+        information_str = "(length:" + str(len(target_str)) + ")"
+        print("[INFO] copy", target_file, information_str)
     
