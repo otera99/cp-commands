@@ -72,6 +72,11 @@ if __name__ == "__main__":
     parser.add_argument('-c', '--copy', action='store_true', help='copy source')
     parser.add_argument('-modify', '--modify', action='store_true', help='modify source')
     
+    parser.add_argument('-gm', '--gppm', action='store_true', help='-g++ -m')
+    parser.add_argument('-ge', '--gppexe', action='store_true', help='-g++ -exe')
+    parser.add_argument('-ged', '--gppexedeb', action='store_true', help='-g++ -exe -deb')
+    parser.add_argument('-gei', '--gppexei', action='store_true', help='-g++ -exe --i num')
+    
     parser.add_argument('-get', '--get_lib_path', action='store_true', help='Get Library Path')
     opts = parser.parse_args()
     
@@ -118,6 +123,24 @@ if __name__ == "__main__":
         opts.execute = "execute"
         opts.i = "./tests/sample-" + opts.acdeb + ".in"
         # opts.expand = "expand"
+        
+    if opts.gppm:
+        opts.compile = "compile"
+        opts.message = "message"
+        
+    if opts.gppexe:
+        opts.compile = "compile"
+        opts.execute = "execute"
+        
+    if opts.gppexedeb:
+        opts.compile = "compile"
+        opts.execute = "execute"
+        opts.debug = "debug"
+        
+    if opts.gppexei:
+        opts.compile = "compile"
+        opts.execute = "execute"
+        opts.i = opts.gppexei
 
     if opts.compile:
         print("[INFO] start: compile")
@@ -140,12 +163,12 @@ if __name__ == "__main__":
         idx = res_str.find("error")
         if idx != -1:
             print(RED + "[ERROR] compile error" + END)
-            if opts.message:
-                print(res_str)
+            # if opts.message:
+            print(res_str)
             if (not opts.force):
                 exit(0)
         else:
-            print("[INFO] done: compile")
+            print(BLUE + "[INFO] done: compile" + END)
 
     if opts.online_judge:
         if opts.d:
@@ -182,12 +205,12 @@ if __name__ == "__main__":
             else:
                 call(command)
 
-    if opts.expand:
-        if otera_lib_path != "can_not_find":
-            expand_command = ["python3", otera_lib_path + "/expander.py", "--lib", otera_lib_path, opts.source]
-            if not(opts.atcoder or opts.yukicoder):
-                expand_command.append("-ac")
-            call(expand_command)
+    # if opts.expand:
+    if otera_lib_path != "can_not_find":
+        expand_command = ["python3", otera_lib_path + "/expander.py", "--lib", otera_lib_path, opts.source]
+        if not(opts.atcoder or opts.yukicoder):
+            expand_command.append("-ac")
+        call(expand_command)
 
     # ファイルのコピー機能を追加
     target_file = opts.source
@@ -201,8 +224,8 @@ if __name__ == "__main__":
         target_file = "combined.cpp"
     elif opts.yukicoder and otera_lib_path != "can_not_find":
         target_file = "combined_otera.cpp"
-    elif otera_lib_path != "can_not_find":
-        target_file = "combined_otera.cpp"
+    # elif otera_lib_path != "can_not_find":
+    #     target_file = "combined_otera.cpp"
 
     if opts.atcoder:
         submit_file = "atcoder_submit.cpp"
@@ -230,4 +253,4 @@ if __name__ == "__main__":
         call(modify_command)
         
     if opts.modify or opts.sanitaizer:
-        print(RED + "[WARN]: DO NOT EDIT modiy.cpp" + END)
+        print(RED + "[WARN]: DO NOT EDIT modify.cpp" + END)
