@@ -166,6 +166,7 @@ if __name__ == "__main__":
             # if opts.message:
             print(res_str)
             if (not opts.force):
+                print(RED + "[ERROR] compile error and cancel processing" + END)
                 exit(0)
         else:
             print(BLUE + "[INFO] done: compile" + END)
@@ -193,6 +194,9 @@ if __name__ == "__main__":
             else:
                 proc = run(command, stdin=open(opts.i), stdout=PIPE, stderr=STDOUT, text=True)
                 print(proc.stdout)
+                if proc.returncode != 0:
+                    print(RED + "[ERROR]: Run-time Error" + END)
+                    exit(0)
         else:
             if opts.output:
                 if opts.noinput:
@@ -203,31 +207,36 @@ if __name__ == "__main__":
                     text = input()
                     run(command, input=text, stdout=open(opts.output, "w"), text=True)
             else:
-                call(command)
+                # call(command)
+                proc = run(command, stdout=PIPE, stderr=PIPE, text=True)
+                print(proc.stdout)
+                if proc.returncode != 0:
+                    print(RED + "[ERROR]: Run-time Error" + END)
+                    exit(0)
 
-    # if opts.expand:
-    if otera_lib_path != "can_not_find":
-        expand_command = ["python3", otera_lib_path + "/expander.py", "--lib", otera_lib_path, opts.source]
-        if not(opts.atcoder or opts.yukicoder):
-            expand_command.append("-ac")
-        call(expand_command)
+    if opts.expand:
+        if otera_lib_path != "can_not_find":
+            expand_command = ["python3", otera_lib_path + "/expander.py", "--lib", otera_lib_path, opts.source]
+            if not(opts.atcoder or opts.yukicoder):
+                expand_command.append("-ac")
+            call(expand_command)
 
     # ファイルのコピー機能を追加
     target_file = opts.source
     
-    if otera_lib_path != "can_not_find":
+    if otera_lib_path != "can_not_find" and opts.expand:
         target_file = "combined.cpp"
     
-    if opts.atcoder and otera_lib_path != "can_not_find":
+    if opts.atcoder and otera_lib_path != "can_not_find" and opts.expand:
         target_file = "combined_otera.cpp"
-    elif opts.codeforces and otera_lib_path != "can_not_find":
+    elif opts.codeforces and otera_lib_path != "can_not_find" and opts.expand:
         target_file = "combined.cpp"
-    elif opts.yukicoder and otera_lib_path != "can_not_find":
+    elif opts.yukicoder and otera_lib_path != "can_not_find" and opts.expand:
         target_file = "combined_otera.cpp"
     # elif otera_lib_path != "can_not_find":
     #     target_file = "combined_otera.cpp"
 
-    if opts.atcoder:
+    if opts.atcoder and opts.expand and opts.copy:
         submit_file = "atcoder_submit.cpp"
         submit_writer = open(submit_file, "w")
         target_reader = open(target_file).read()
