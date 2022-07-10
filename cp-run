@@ -71,6 +71,7 @@ if __name__ == "__main__":
     parser.add_argument('-m', '--message', action='store_true', help='display message')
     parser.add_argument('-c', '--copy', action='store_true', help='copy source')
     parser.add_argument('-modify', '--modify', action='store_true', help='modify source')
+    parser.add_argument('--err', help='oj t -e err')
     
     parser.add_argument('-gm', '--gppm', action='store_true', help='-g++ -m')
     parser.add_argument('-ge', '--gppexe', action='store_true', help='-g++ -exe')
@@ -172,11 +173,14 @@ if __name__ == "__main__":
             print(BLUE + "[INFO] done: compile" + END)
 
     if opts.online_judge:
+        oj_command = ["oj", "t"]
+        if opts.err:
+            oj_command.extend(["-e", opts.err])
+        
         if opts.d:
-            oj_command = ["oj", "t", "-d", opts.d]
+            oj_command.extend(["-d", opts.d])
             call(oj_command)
         else:
-            oj_command = ["oj", "t"]
             call(oj_command)
 
     if opts.execute:
@@ -196,6 +200,8 @@ if __name__ == "__main__":
                 print(proc.stdout)
                 if proc.returncode != 0:
                     print(RED + "[ERROR]: Run-time Error" + END)
+                    if opts.modify or opts.sanitaizer:
+                        print(RED + "[WARN]: DO NOT EDIT modify.cpp" + END)
                     exit(0)
         else:
             if opts.output:
@@ -212,9 +218,11 @@ if __name__ == "__main__":
                 print(proc.stdout)
                 if proc.returncode != 0:
                     print(RED + "[ERROR]: Run-time Error" + END)
+                    if opts.modify or opts.sanitaizer:
+                        print(RED + "[WARN]: DO NOT EDIT modify.cpp" + END)
                     exit(0)
 
-    if opts.expand:
+    if opts.expand or opts.copy:
         if otera_lib_path != "can_not_find":
             expand_command = ["python3", otera_lib_path + "/expander.py", "--lib", otera_lib_path, opts.source]
             if not(opts.atcoder or opts.yukicoder):
@@ -224,19 +232,19 @@ if __name__ == "__main__":
     # ファイルのコピー機能を追加
     target_file = opts.source
     
-    if otera_lib_path != "can_not_find" and opts.expand:
+    if otera_lib_path != "can_not_find" and (opts.expand or opts.copy):
         target_file = "combined.cpp"
     
-    if opts.atcoder and otera_lib_path != "can_not_find" and opts.expand:
+    if opts.atcoder and otera_lib_path != "can_not_find" and (opts.expand or opts.copy):
         target_file = "combined_otera.cpp"
-    elif opts.codeforces and otera_lib_path != "can_not_find" and opts.expand:
+    elif opts.codeforces and otera_lib_path != "can_not_find" and (opts.expand or opts.copy):
         target_file = "combined.cpp"
-    elif opts.yukicoder and otera_lib_path != "can_not_find" and opts.expand:
+    elif opts.yukicoder and otera_lib_path != "can_not_find" and (opts.expand or opts.copy):
         target_file = "combined_otera.cpp"
     # elif otera_lib_path != "can_not_find":
     #     target_file = "combined_otera.cpp"
 
-    if opts.atcoder and opts.expand and opts.copy:
+    if opts.atcoder and opts.copy:
         submit_file = "atcoder_submit.cpp"
         submit_writer = open(submit_file, "w")
         target_reader = open(target_file).read()
