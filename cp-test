@@ -1,0 +1,156 @@
+#!/usr/bin/env python3
+
+import re
+import sys
+import argparse
+from logging import Logger, basicConfig, getLogger
+from os import getenv, environ, pathsep, fspath
+from pathlib import Path, PurePath
+from typing import List, Set, Optional
+from subprocess import call, Popen, PIPE, run, STDOUT
+import difflib
+
+OTERA_LIBRARY = 'otera-cp-library'
+ATCODER_LIBRARY = 'ac-library'
+
+RED = '\033[91m'
+BLUE = '\033[94m'
+GREEN = '\033[92m'
+END = '\033[0m'
+
+# 現在のPATHからotera-cp-libraryを探すような実装
+class Lib_Serach:
+    def __init__(self):
+        pass
+
+    def find_otera(self):
+        self.cur_path = Path.cwd()
+        self.count = 0
+        while self.count < 20:
+            otera_library_path = self.cur_path / OTERA_LIBRARY
+            if otera_library_path.exists():
+                print("[INFO] find path of otera-cp-library as ", str(otera_library_path))
+                return str(otera_library_path)
+            self.count += 1
+            self.cur_path = self.cur_path.parent
+
+        print(RED + "[INFO] can not find otera-cp-library" + END)
+        return "could_not_found"
+
+if __name__ == "__main__":
+    basicConfig(
+        format="%(asctime)s [%(levelname)s] %(message)s",
+        datefmt="%H:%M:%S",
+        level=getenv('LOG_LEVEL', 'INFO'),
+    )
+    parser = argparse.ArgumentParser(description='Run')
+    parser.add_argument('source', help='Source File')
+
+    parser.add_argument('--tle', help='TLE code')
+    parser.add_argument('--gen', help='generate code')
+    parser.add_argument('--cnt', help='serach count')
+    parser.add_argument('--lib', help='otera-cp-library path')
+    parser.add_argument('-needac', '--NEEDAC', action='store_true', help='need AC sample')
+    opts = parser.parse_args()
+    
+    otera_lib_path = "could_not_found"
+    
+    if opts.lib:
+        otera_lib_path = opts.lib
+    else:
+        lib_serach = Lib_Serach()
+        otera_lib_path = lib_serach.find_otera()
+    
+    atcoder_lib_path = otera_lib_path + '/' + ATCODER_LIBRARY
+        
+    tle_code = "tle.cpp"
+    gen_code = "gen.cpp"
+    
+    if opts.tle:
+        tle_code = opts.tle
+
+    if opts.gen:
+        gen_code = opts.gen
+        
+    source_out = "a.out"
+    tle_out = "tle.out"
+    gen_out = "gen.out"
+    
+    source_compile_command = []
+    
+    source_compile_command = ["g++", opts.source, "-std=gnu++17", "-O2"]
+    if otera_lib_path != "could_not_found":
+        source_compile_command.extend(["-I", otera_lib_path, "-I", atcoder_lib_path])
+    source_compile_command.extend(["-o", source_out])
+    run(source_compile_command)
+    
+    tle_compile_command = ["g++", tle_code, "-std=gnu++17", "-O2"]
+    if otera_lib_path != "could_not_found":
+        tle_compile_command.extend(["-I", otera_lib_path, "-I", atcoder_lib_path])
+    tle_compile_command.extend(["-o", tle_out])
+    run(tle_compile_command)
+    
+    gen_compile_command = ["g++", gen_code, "-std=gnu++17", "-O2"]
+    if otera_lib_path != "could_not_found":
+        gen_compile_command.extend(["-I", otera_lib_path, "-I", atcoder_lib_path])
+    gen_compile_command.extend(["-o", gen_out])
+    run(gen_compile_command)
+    
+    count = 0
+    
+    RE_count = 0
+    WA_count = 0
+    AC_count = 0
+        
+    while True:
+        gen_exe = "gen_out.txt" # in
+        source_exe = "source_out.txt"
+        tle_exe = "tle_out.txt" # out
+        
+        gen_command = ["./" + gen_out]
+        run(gen_command, stdout=open(gen_exe, "w"), text=True)
+        
+        tle_command = ["./" +  tle_out]
+        run(tle_command, stdin=open(gen_exe), stdout=open(tle_exe, "w"), text=True)
+        
+        source_command = ["./" + source_out]
+        proc = run(source_command, stdin=open(gen_exe), stdout=open(source_exe, "w"), stderr=PIPE, text=True)
+        
+        if proc.returncode != 0:
+            RE_count += 1
+            mv_in_command = ["mv " + gen_exe + " RE_tests/sample-" + str(RE_count) + "in"]
+            mv_out_command = ["mv " + tle_exe + " RE_tests/sample-" + str(RE_count) + "out"]
+            call(mv_in_command, shell=True)
+            call(mv_out_command, shell=True)
+            continue
+        
+        tle_file = open(tle_exe)
+        source_file = open(source_exe)
+        
+        print(tle_file.read())
+        print(source_file.read())
+        
+        tle_file_ = open(tle_exe)
+        source_file_ = open(source_exe)
+        
+        AC = (tle_file_.read() == source_file_.read())
+        print(AC)
+
+        if AC:
+            AC_count += 1
+            if not opts.NEEDAC:
+                continue
+            mv_in_command = ["mv " + gen_exe + " AC_tests/sample-" + str(AC_count) + "in"]
+            mv_out_command = ["mv " + tle_exe + " AC_tests/sample-" + str(AC_count) + "out"]
+            run(mv_in_command, shell=True)
+            run(mv_out_command, shell=True)
+        else:
+            WA_count += 1
+            mv_in_command = ["mv " + gen_exe + " WA_tests/sample-" + str(WA_count) + ".in"]
+            mv_out_command = ["mv " + tle_exe + " WA_tests/sample-" + str(WA_count) + ".out"]
+            run(mv_in_command, shell=True)
+            run(mv_out_command, shell=True)
+        
+        ++ count
+        # if count >= int(opts.cnt):
+        #     break
