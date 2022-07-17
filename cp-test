@@ -113,6 +113,15 @@ if __name__ == "__main__":
     
     print(BLUE + "[INFO] done: compile" + END)
     
+    WA_DIR = "WA_tests"
+        
+    if opts.dir:
+        WA_DIR = opts.dir
+    
+    call("mkdir AC_tests",shell=True)
+    call("mkdir RE_tests",shell=True)
+    call("mkdir " + WA_DIR,shell=True)
+    
     count = 0
     
     RE_count = 0
@@ -153,11 +162,6 @@ if __name__ == "__main__":
         
         AC = (tle_file_.read() == source_file_.read())
         # print(AC)
-        
-        WA_DIR = "WA_tests"
-        
-        if opts.dir:
-            WA_DIR = opts.dir
 
         if AC:
             AC_count += 1
