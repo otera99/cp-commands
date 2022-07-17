@@ -51,6 +51,7 @@ if __name__ == "__main__":
     parser.add_argument('--cnt', help='serach count')
     parser.add_argument('--lib', help='otera-cp-library path')
     parser.add_argument('-needac', '--NEEDAC', action='store_true', help='need AC sample')
+    parser.add_argument('--dir', help='otera-cp-library path')
     opts = parser.parse_args()
     
     otera_lib_path = "could_not_found"
@@ -76,25 +77,41 @@ if __name__ == "__main__":
     tle_out = "tle.out"
     gen_out = "gen.out"
     
+    print("[INFO] start: compile")
+    
     source_compile_command = []
     
     source_compile_command = ["g++", opts.source, "-std=gnu++17", "-O2"]
     if otera_lib_path != "could_not_found":
         source_compile_command.extend(["-I", otera_lib_path, "-I", atcoder_lib_path])
     source_compile_command.extend(["-o", source_out])
-    run(source_compile_command)
+    proc_s = run(source_compile_command, stderr=PIPE, text=True)
+    res_str_s = proc_s.stderr
+    idx_s = res_str_s.find("error")
+    if idx_s != -1:
+        print(RED + "[ERROR] " + opts.source + " compile error" + END)
     
     tle_compile_command = ["g++", tle_code, "-std=gnu++17", "-O2"]
     if otera_lib_path != "could_not_found":
         tle_compile_command.extend(["-I", otera_lib_path, "-I", atcoder_lib_path])
     tle_compile_command.extend(["-o", tle_out])
-    run(tle_compile_command)
+    proc_t = run(tle_compile_command, stderr=PIPE, text=True)
+    res_str_t = proc_t.stderr
+    idx_t = res_str_t.find("error")
+    if idx_t != -1:
+        print(RED + "[ERROR] " + tle_code + " compile error" + END)
     
     gen_compile_command = ["g++", gen_code, "-std=gnu++17", "-O2"]
     if otera_lib_path != "could_not_found":
         gen_compile_command.extend(["-I", otera_lib_path, "-I", atcoder_lib_path])
     gen_compile_command.extend(["-o", gen_out])
-    run(gen_compile_command)
+    proc_c = run(gen_compile_command, stderr=PIPE, text=True)
+    res_str_c = proc_c.stderr
+    idx_c = res_str_c.find("error")
+    if idx_c != -1:
+        print(RED + "[ERROR] " + gen_code + " compile error" + END)
+    
+    print(BLUE + "[INFO] done: compile" + END)
     
     count = 0
     
@@ -118,6 +135,7 @@ if __name__ == "__main__":
         
         if proc.returncode != 0:
             RE_count += 1
+            print(RED + "RE" + END)
             mv_in_command = ["mv " + gen_exe + " RE_tests/sample-" + str(RE_count) + "in"]
             mv_out_command = ["mv " + tle_exe + " RE_tests/sample-" + str(RE_count) + "out"]
             call(mv_in_command, shell=True)
@@ -127,17 +145,23 @@ if __name__ == "__main__":
         tle_file = open(tle_exe)
         source_file = open(source_exe)
         
-        print(tle_file.read())
-        print(source_file.read())
+        # print(tle_file.read())
+        # print(source_file.read())
         
         tle_file_ = open(tle_exe)
         source_file_ = open(source_exe)
         
         AC = (tle_file_.read() == source_file_.read())
-        print(AC)
+        # print(AC)
+        
+        WA_DIR = "WA_tests"
+        
+        if opts.dir:
+            WA_DIR = opts.dir
 
         if AC:
             AC_count += 1
+            print(GREEN + "AC" + END)
             if not opts.NEEDAC:
                 continue
             mv_in_command = ["mv " + gen_exe + " AC_tests/sample-" + str(AC_count) + "in"]
@@ -146,8 +170,9 @@ if __name__ == "__main__":
             run(mv_out_command, shell=True)
         else:
             WA_count += 1
-            mv_in_command = ["mv " + gen_exe + " WA_tests/sample-" + str(WA_count) + ".in"]
-            mv_out_command = ["mv " + tle_exe + " WA_tests/sample-" + str(WA_count) + ".out"]
+            print(RED + "WA" + END)
+            mv_in_command = ["mv " + gen_exe + " " + WA_DIR + "/sample-" + str(WA_count) + ".in"]
+            mv_out_command = ["mv " + tle_exe + " " + WA_DIR + "/sample-" + str(WA_count) + ".out"]
             run(mv_in_command, shell=True)
             run(mv_out_command, shell=True)
         
