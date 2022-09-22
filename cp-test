@@ -52,7 +52,7 @@ if __name__ == "__main__":
     parser.add_argument('--lib', help='otera-cp-library path')
     parser.add_argument('-needac', '--NEEDAC', action='store_true', help='need AC sample')
     parser.add_argument('-nog', '--NO_COMPILE', action='store_true', help='NO COMPILE')
-    parser.add_argument('--dir', help='otera-cp-library path')
+    parser.add_argument('--dir', help='WA_dir')
     opts = parser.parse_args()
     
     otera_lib_path = "could_not_found"
@@ -133,9 +133,9 @@ if __name__ == "__main__":
         
     while True:
         if count >= int(opts.cnt):
-            print("AC:", AC_count)
-            print("WA:", WA_count)
-            print("RE:", RE_count)
+            print(GREEN + "AC" + END + ": " + str(AC_count))
+            print(RED + "WA" + END + ": " + str(WA_count))
+            print(RED + "RE" + END + ": " + str(RE_count))
             break
             
         count += 1
@@ -155,7 +155,7 @@ if __name__ == "__main__":
         
         if proc.returncode != 0:
             RE_count += 1
-            print(RED + "RE" + END)
+            print(str(count) +  ": " + RED + "RE" + END)
             mv_in_command = ["mv " + gen_exe + " RE_tests/sample-" + str(RE_count) + "in"]
             mv_out_command = ["mv " + tle_exe + " RE_tests/sample-" + str(RE_count) + "out"]
             call(mv_in_command, shell=True)
@@ -176,7 +176,7 @@ if __name__ == "__main__":
 
         if AC:
             AC_count += 1
-            print(GREEN + "AC" + END)
+            print(str(count) +  ": " + GREEN + "AC" + END)
             if opts.NEEDAC:
                 mv_in_command = ["mv " + gen_exe + " AC_tests/sample-" + str(AC_count) + "in"]
                 mv_out_command = ["mv " + tle_exe + " AC_tests/sample-" + str(AC_count) + "out"]
@@ -184,7 +184,7 @@ if __name__ == "__main__":
                 run(mv_out_command, shell=True)
         else:
             WA_count += 1
-            print(RED + "WA" + END)
+            print(str(count) +  ": " + RED + "WA" + END)
             mv_in_command = ["mv " + gen_exe + " " + WA_DIR + "/sample-" + str(WA_count) + ".in"]
             mv_out_command = ["mv " + tle_exe + " " + WA_DIR + "/sample-" + str(WA_count) + ".out"]
             run(mv_in_command, shell=True)
