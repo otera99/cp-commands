@@ -158,6 +158,8 @@ if __name__ == "__main__":
             modify_command = ["python3", otera_lib_path + "/modify.py", "--lib", otera_lib_path, opts.source]
             call(modify_command)
             compile_command = ["/usr/bin/g++", "modify.cpp", "-std=c++17", "-g", "-Wall", "-Wextra", "-fsanitize=address", "-fsanitize=undefined", "-O2"]
+            if otera_lib_path != "can_not_find":
+                compile_command.extend(["-I", otera_lib_path, "-I", atcoder_lib_path])
         
         proc = run(compile_command, stderr=PIPE, text=True)
         res_str = proc.stderr
