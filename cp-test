@@ -51,7 +51,8 @@ if __name__ == "__main__":
     parser.add_argument('--cnt', help='serach count')
     parser.add_argument('--lib', help='otera-cp-library path')
     parser.add_argument('-needac', '--NEEDAC', action='store_true', help='need AC sample')
-    parser.add_argument('-nog', '--NO_COMPILE', action='store_true', help='NO COMPILE')
+    parser.add_argument('-ng', '--NO_COMPILE', action='store_true', help='NO COMPILE')
+    parser.add_argument('-no-tle', '--NO_TLE_CODE', action='store_true', help='NO TLE CODE')
     parser.add_argument('--dir', help='WA_dir')
     opts = parser.parse_args()
     
@@ -92,16 +93,17 @@ if __name__ == "__main__":
         idx_s = res_str_s.find("error")
         if idx_s != -1:
             print(RED + "[ERROR] " + opts.source + " compile error" + END)
-        
-        tle_compile_command = ["g++", tle_code, "-std=gnu++17", "-O2"]
-        if otera_lib_path != "could_not_found":
-            tle_compile_command.extend(["-I", otera_lib_path, "-I", atcoder_lib_path])
-        tle_compile_command.extend(["-o", tle_out])
-        proc_t = run(tle_compile_command, stderr=PIPE, text=True)
-        res_str_t = proc_t.stderr
-        idx_t = res_str_t.find("error")
-        if idx_t != -1:
-            print(RED + "[ERROR] " + tle_code + " compile error" + END)
+            
+        if not opts.NO_TLE_CODE:
+            tle_compile_command = ["g++", tle_code, "-std=gnu++17", "-O2"]
+            if otera_lib_path != "could_not_found":
+                tle_compile_command.extend(["-I", otera_lib_path, "-I", atcoder_lib_path])
+            tle_compile_command.extend(["-o", tle_out])
+            proc_t = run(tle_compile_command, stderr=PIPE, text=True)
+            res_str_t = proc_t.stderr
+            idx_t = res_str_t.find("error")
+            if idx_t != -1:
+                print(RED + "[ERROR] " + tle_code + " compile error" + END)
         
         gen_compile_command = ["g++", gen_code, "-std=gnu++17", "-O2"]
         if otera_lib_path != "could_not_found":
@@ -130,9 +132,14 @@ if __name__ == "__main__":
     RE_count = 0
     WA_count = 0
     AC_count = 0
+    
+    TEST_count = 20
+    
+    if opts.cnt:
+        TEST_count = int(opts.cnt)
         
     while True:
-        if count >= int(opts.cnt):
+        if count >= TEST_count:
             print(GREEN + "AC" + END + ": " + str(AC_count))
             print(RED + "WA" + END + ": " + str(WA_count))
             print(RED + "RE" + END + ": " + str(RE_count))
@@ -148,7 +155,9 @@ if __name__ == "__main__":
         run(gen_command, stdout=open(gen_exe, "w"), text=True)
         
         tle_command = ["./" +  tle_out]
-        run(tle_command, stdin=open(gen_exe), stdout=open(tle_exe, "w"), text=True)
+        
+        if not opts.NO_TLE_CODE:
+            run(tle_command, stdin=open(gen_exe), stdout=open(tle_exe, "w"), text=True)
         
         source_command = ["./" + source_out]
         proc = run(source_command, stdin=open(gen_exe), stdout=open(source_exe, "w"), stderr=PIPE, text=True)
@@ -157,9 +166,20 @@ if __name__ == "__main__":
             RE_count += 1
             print(str(count) +  ": " + RED + "RE" + END)
             mv_in_command = ["mv " + gen_exe + " RE_tests/sample-" + str(RE_count) + "in"]
-            mv_out_command = ["mv " + tle_exe + " RE_tests/sample-" + str(RE_count) + "out"]
+            if not opts.NO_TLE_CODE:
+                mv_out_command = ["mv " + tle_exe + " RE_tests/sample-" + str(RE_count) + "out"]
             call(mv_in_command, shell=True)
             call(mv_out_command, shell=True)
+            continue
+        
+        if opts.NO_TLE_CODE:
+            AC_count += 1
+            print(str(count) +  ": " + GREEN + "AC" + END)
+            if opts.NEEDAC:
+                mv_in_command = ["mv " + gen_exe + " AC_tests/sample-" + str(AC_count) + "in"]
+                mv_out_command = ["mv " + source_exe + " AC_tests/sample-" + str(AC_count) + "out"]
+                run(mv_in_command, shell=True)
+                run(mv_out_command, shell=True)
             continue
         
         tle_file = open(tle_exe)

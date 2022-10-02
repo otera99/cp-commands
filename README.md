@@ -4,34 +4,33 @@
 
 ### cp-run
 
-AtCoderの場合、[atcoder-cli](https://github.com/Tatamo/atcoder-cli)で生成したファイル下にコードで書き、`cp-run source -aca`とすることで、コンパイル、[online-judge-tools](https://github.com/online-judge-tools/oj)によるテスト、[otera-cp-library](https://github.com/otera99/otera-cp-library)の展開、提出用コードのクリップボードへのコピーを一度に行える.
-
-Codeforcesの場合もAtCoderと同様に問題ごとのファイルを作り、[online-judge-tools](https://github.com/online-judge-tools/oj)でテストケースをダウンロードしておけば、あとはコードを書いた後、`cp-run source -cfa`とすることで、コンパイル、[online-judge-tools](https://github.com/online-judge-tools/oj)によるテスト、[AtCoder Library (ACL)](https://github.com/atcoder/ac-library)と[otera-cp-library](https://github.com/otera99/otera-cp-library)の展開、提出用コードのクリップボードへのコピーを一度に行える.
-
-なお、現時点では、C++以外の言語には対応していない.
+コンパイル(sanitazerも付けれる)，ojによるtest，ライブラリの自動展開，コードのcopy，テストケースの個別実行などが行える．
 
 ### cp-test
 
-ランダム生成したテストケースで愚直解との比較が可能
+ランダム生成したテストケースで愚直解との比較が可能．
 
 ## 使い方
 
 ### cp-run
 
-競技プログラミング用のrepositoryを作って、そこの下に[otera-cp-library](https://github.com/otera99/otera-cp-library)をダウンロードして入れる.
-
-作った競技プログラミング用のrepositoryに、`atcoder`, `codeforces`, `yukicoder`のファイルを新たに作る.
-`atcoder`, `codeforces`, `yukicoder`ファイル下では、各コンテストごとにまたファイルを作り、そのコンテストごとのファイル下に、さらに各問題ごとのファイルと作り、その下で問題に対応したコードを書くと良い.
-([online-judge-tools](https://github.com/online-judge-tools/oj)と[atcoder-cli](https://github.com/Tatamo/atcoder-cli)という神ツールがあるので、そちらの使用を想定している.)
+以下のコマンドで，コンパイル，ojによるtest，ライブラリの自動展開，クリップボードにコードをcopyが行える．
+```
+cp-run source -a
+```
+以下のコマンドで，コンパイル(-DDEBUG option付き)，ojによって生成されたテストケースについてテストの実行が行える．
+```
+cp-run source --deb {テストケースの番号} 
+```
 
 ### cp-test
 
 愚直解のコード(```tle.cpp```)と，テストケース生成コード(```gen.cpp```)を用意して，
 
-
 ```
 cp-test source
 ```
+とすると良い．
 
 #### option
 
@@ -56,22 +55,13 @@ chmod u+x {path to cp-commands}/cp-test
 
 なお、 https://qiita.com/i_shot1997/items/1699331e526cb90615df を参照すると良い.
 
-## TODO
-コンパイル時に参照するライブラリのpathを`lib_serach.find_otera()`で見つけたものにするように書きかえる.(2022.03.01に追加済み)
+また，[atcoder-cli](https://github.com/Tatamo/atcoder-cli)を使う際には，以下のコマンドで，生成されるテストケースのdirectoryの名前を`tests`から`test`に変更しておく．
 
-`lib_serach.find_otera()`の修正
+また，[otera-cp-library](https://github.com/otera99/otera-cp-library)を使いたい場合は，普段使う競技プログラミング用のrepositoryの下に[otera-cp-library](https://github.com/otera99/otera-cp-library)をダウンロードして入れておく．
 
-ojコマンドのoptionを使えるようにする
-
-AtCoderにコードを提出する時、`const int inf = 1'000'000'007;`などとすると、コメントと判定されてコードが読みにくくなるので、後ろに`//'`などとつけて展開してくれる機能があると嬉しい(2022.03.01に追加済み)
-
-コンパイルに失敗したら、ojコマンドなどは実行しないで欲しい.
-
-printでmessageを出してるけど、loggingとかを使うべき.
-
-C++以外(Python)のコードにも対応する.
-
-`-exe`オプションを使う時、`./a.out`が実行されたことを表示してほしい.(その後で、標準入力を与えたいので)
+```
+acc config default-test-dirname-format test
+```
 
 ## 注意
-コードのクリップボードへのコピーまでには数秒ほどかかるので(ojでテストにかかる時間などで)、実行が終わった(コピーが終わったと出る)までは、コードを提出しないように気をつける.
+コードのクリップボードへのコピーまでには数秒ほどかかるので(コンパイルやojでテストにかかる時間などで)、実行が終わった(コピーが終わったと出る)までは、コードを提出しないように気をつける.
