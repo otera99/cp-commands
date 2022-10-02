@@ -4,7 +4,7 @@
 
 ### cp-run
 
-コンパイル(sanitazerも付けれる)，ojによるtest，ライブラリ([otera-cp-library](https://github.com/otera99/otera-cp-library))の自動展開，コードのcopy，テストケースの個別実行などが行える．
+コンパイル，ojによるtest，ライブラリ([otera-cp-library](https://github.com/otera99/otera-cp-library))の自動展開，コードのcopy，テストケースの個別実行などが行える．
 
 ### cp-test
 
@@ -21,6 +21,23 @@ cp-run source -a
 以下のコマンドで，コンパイル(-DDEBUG option付き)，ojによって生成されたテストケースについてテストの実行が行える．
 ```
 cp-run source --deb {テストケースの番号} 
+```
+
+#### option
+
+sanitizer付きでコンパイル
+```
+-sani
+```
+
+`-DDEBUG`のoption付きでコンパイル
+```
+-deb
+```
+
+誤差付きjudgeの場合のoj
+```
+--err {ojに-eで渡す誤差}
 ```
 
 ### cp-test
