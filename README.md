@@ -57,11 +57,11 @@ chmod u+x {path to cp-commands}/cp-test
 
 また，[atcoder-cli](https://github.com/Tatamo/atcoder-cli)を使う際には，以下のコマンドで，生成されるテストケースのdirectoryの名前を`tests`から`test`に変更しておく．
 
-また，[otera-cp-library](https://github.com/otera99/otera-cp-library)を使いたい場合は，普段使う競技プログラミング用のrepositoryの下に[otera-cp-library](https://github.com/otera99/otera-cp-library)をダウンロードして入れておく．
-
 ```
 acc config default-test-dirname-format test
 ```
+
+また，[otera-cp-library](https://github.com/otera99/otera-cp-library)を使いたい場合は，普段使う競技プログラミング用のrepositoryの下に[otera-cp-library](https://github.com/otera99/otera-cp-library)をダウンロードして入れておく．
 
 ## 注意
 コードのクリップボードへのコピーまでには数秒ほどかかるので(コンパイルやojでテストにかかる時間などで)、実行が終わった(コピーが終わったと出る)までは、コードを提出しないように気をつける.
