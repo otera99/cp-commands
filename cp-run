@@ -74,9 +74,9 @@ if __name__ == "__main__":
     parser.add_argument('--err', help='oj t -e err')
     
     parser.add_argument('-gm', '--gppm', action='store_true', help='-g++ -m')
-    parser.add_argument('-ge', '--gppexe', action='store_true', help='-g++ -exe')
-    parser.add_argument('-ged', '--gppexedeb', action='store_true', help='-g++ -exe -deb')
-    parser.add_argument('-gei', '--gppexei', action='store_true', help='-g++ -exe --i num')
+    parser.add_argument('-gexe', '--gppexe', action='store_true', help='-g++ -exe')
+    parser.add_argument('-gexed', '--gppexedeb', action='store_true', help='-g++ -exe -deb')
+    parser.add_argument('-gexei', '--gppexei', action='store_true', help='-g++ -exe --i num')
     
     parser.add_argument('-get', '--get_lib_path', action='store_true', help='Get Library Path')
     opts = parser.parse_args()
