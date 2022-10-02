@@ -4,7 +4,7 @@
 
 ### cp-run
 
-コンパイル(sanitazerも付けれる)，ojによるtest，ライブラリの自動展開，コードのcopy，テストケースの個別実行などが行える．
+コンパイル(sanitazerも付けれる)，ojによるtest，ライブラリ([otera-cp-library](https://github.com/otera99/otera-cp-library))の自動展開，コードのcopy，テストケースの個別実行などが行える．
 
 ### cp-test
 
