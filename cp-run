@@ -143,6 +143,8 @@ if __name__ == "__main__":
         opts.i = opts.gppexei
 
     if opts.compile:
+        if opts.sanitaizer and otera_lib_path == "can_not_find":
+            print(RED + "[WARN] : can not generate modify.cpp" + END)
         print("[INFO] start: compile")
         compile_command = ["g++", opts.source, "-std=gnu++17", "-O2"]
         if otera_lib_path != "can_not_find":
@@ -153,12 +155,12 @@ if __name__ == "__main__":
         if opts.o:
             compile_command.extend(["-o", opts.o])
         # call(compile_command)
-        if opts.sanitaizer:
+        if opts.sanitaizer and otera_lib_path != "can_not_find":
             modify_command = ["python3", otera_lib_path + "/modify.py", "--lib", otera_lib_path, opts.source]
             call(modify_command)
             compile_command = ["/usr/bin/g++", "modify.cpp", "-std=c++17", "-g", "-Wall", "-Wextra", "-fsanitize=address", "-fsanitize=undefined", "-O2"]
-            if otera_lib_path != "can_not_find":
-                compile_command.extend(["-I", otera_lib_path, "-I", atcoder_lib_path])
+            # if otera_lib_path != "can_not_find":
+            compile_command.extend(["-I", otera_lib_path, "-I", atcoder_lib_path])
         
         proc = run(compile_command, stderr=PIPE, text=True)
         res_str = proc.stderr
