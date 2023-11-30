@@ -204,6 +204,7 @@ if __name__ == "__main__":
                 if proc.returncode != 0:
                     print(RED + "[ERROR]: Run-time Error" + END)
                     if opts.modify or opts.sanitaizer:
+                        print(RED + "[INFO]: 21 lines were added to modify.cpp" + END)
                         print(RED + "[WARN]: DO NOT EDIT modify.cpp" + END)
                     exit(0)
         else:
@@ -222,6 +223,7 @@ if __name__ == "__main__":
                 if proc.returncode != 0:
                     print(RED + "[ERROR]: Run-time Error" + END)
                     if opts.modify or opts.sanitaizer:
+                        print(RED + "[INFO]: 21 lines were added to modify.cpp" + END)
                         print(RED + "[WARN]: DO NOT EDIT modify.cpp" + END)
                     exit(0)
 
@@ -273,4 +275,5 @@ if __name__ == "__main__":
         call(modify_command)
         
     if opts.modify or opts.sanitaizer:
+        print(RED + "[INFO]: 21 lines were added to modify.cpp" + END)
         print(RED + "[WARN]: DO NOT EDIT modify.cpp" + END)
